@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>POP! Insurance Roleplay Slot</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    /* ポップでワクワクするゲーミフィケーションデザイン */
+    :root {
+      --bg-gradient: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --primary: #ff4757; --primary-dark: #ff6b81;
+      --secondary: #1e90ff; --accent: #ffa502;
+      --text-main: #2f3542;
+    }
+    body { font-family: 'Zen Maru Gothic', 'Helvetica Neue', Arial, sans-serif; background: var(--bg-gradient); color: var(--text-main); margin: 0; padding: 20px; display: flex; justify-content: center; min-height: 100vh; }
+    .app-container { width: 100%; max-width: 800px; }
+    
+    /* カードUI */
+    .card { background: var(--card-bg); padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); margin-bottom: 20px; border: 3px solid #fff; }
+    h1 { font-size: 24px; color: var(--primary); display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 0; text-shadow: 1px 1px 0px rgba(0,0,0,0.1); }
+    
+    /* スロット筐体 */
+    .slot-machine { background: #2f3640; padding: 20px; border-radius: 16px; border: 5px solid #f1f2f6; box-shadow: 0 10px 0 #1e272e, inset 0 0 20px rgba(0,0,0,0.5); text-align: center; position: relative; }
+    .reels-container { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 25px; }
+    .reel { flex: 1; background: linear-gradient(180deg, #f1f2f6 0%, #ffffff 50%, #f1f2f6 100%); border-radius: 10px; padding: 20px 5px; font-size: 16px; font-weight: 900; color: #ff4757; height: 70px; display: flex; flex-direction: column; justify-content: center; box-shadow: inset 0 5px 10px rgba(0,0,0,0.2), 0 2px 0 #fff; border: 2px solid #dfe4ea; }
+    .reel-label { font-size: 12px; color: #747d8c; position: absolute; top: 8px; left: 0; width: 100%; text-align: center; font-weight: bold; }
+    .reel-content { margin-top: 15px; font-size: 17px; text-shadow: 1px 1px 0px rgba(255,255,255,0.8); }
+    
+    /* ボタン類 */
+    .spin-btn { background: var(--accent); color: #fff; border: none; padding: 15px 40px; font-size: 22px; font-weight: 900; border-radius: 40px; cursor: pointer; box-shadow: 0 6px 0 #eccc68, 0 10px 20px rgba(0,0,0,0.2); transition: all 0.1s; text-transform: uppercase; letter-spacing: 2px; }
+    .spin-btn:active { transform: translateY(6px); box-shadow: 0 0 0 #eccc68, 0 0 0 rgba(0,0,0,0); }
+    
+    /* ツールバー */
+    .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .icon-btn { background: #f1f2f6; border: none; padding: 8px 15px; border-radius: 20px; font-weight: bold; color: #57606f; cursor: pointer; display: flex; align-items: center; gap: 5px; box-shadow: 0 3px 0 #dfe4ea; transition: 0.2s; }
+    .icon-btn:hover { background: #dfe4ea; }
+    .icon-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #dfe4ea; }
+    .icon-btn.active { background: var(--secondary); color: white; box-shadow: 0 3px 0 #1952a1; }
+    
+    /* チャット・マイク */
+    .chat-section { display: none; }
+    .log-container { background: #f8f9fa; border: 2px dashed #ced6e0; border-radius: 12px; padding: 20px; height: 300px; overflow-y: auto; margin-bottom: 20px; font-size: 15px; }
+    .msg { margin-bottom: 15px; line-height: 1.6; }
+    .msg-user { color: #57606f; } .msg-user span { font-weight: 900; color: var(--secondary); }
+    .msg-ai { background: #ffeaa7; padding: 12px 15px; border-radius: 12px; display: inline-block; color: #2d3436; font-weight: bold; border-bottom: 3px solid #fdcb6e; }
+    .msg-system { background: #a29bfe; color: white; padding: 15px; border-radius: 12px; font-weight: bold; white-space: pre-line; }
+
+    .action-area { display: flex; justify-content: center; align-items: center; gap: 30px; }
+    .mic-btn { width: 80px; height: 80px; border-radius: 50%; background: var(--primary); color: white; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; box-shadow: 0 6px 0 #c23616, 0 10px 20px rgba(255, 71, 87, 0.4); transition: 0.2s; }
+    .mic-btn.recording { background: #ffa502; box-shadow: 0 0 0 10px rgba(255, 165, 2, 0.3); animation: pulse 1s infinite; }
+    .close-btn { background: #2ed573; color: white; border: none; padding: 15px 25px; border-radius: 30px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 5px 0 #20bf6b; display: flex; align-items: center; gap: 8px; }
+    .close-btn:active { transform: translateY(5px); box-shadow: 0 0 0 #20bf6b; }
+    
+    .status-text { text-align: center; font-weight: bold; color: var(--primary-dark); margin-top: 15px; }
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <div class="card">
+    <h1><span class="material-icons" style="font-size: 32px;">casino</span> INSURANCE SLOT</h1>
+    <div class="slot-machine">
+      <div class="reels-container">
+        <div class="reel"><div class="reel-label">年代</div><div id="reel1" class="reel-content">???</div></div>
+        <div class="reel"><div class="reel-label">性別</div><div id="reel2" class="reel-content">???</div></div>
+        <div class="reel"><div class="reel-label">家族構成</div><div id="reel3" class="reel-content">???</div></div>
+        <div class="reel"><div class="reel-label">保険状況</div><div id="reel4" class="reel-content">???</div></div>
+      </div>
+      <button id="spinBtn" class="spin-btn">SPIN!</button>
+    </div>
+  </div>
+
+  <div id="chatSection" class="card chat-section">
+    <div class="toolbar">
+      <button id="audioToggleBtn" class="icon-btn active"><span class="material-icons">volume_up</span> 音声ON</button>
+      <button id="exportBtn" class="icon-btn"><span class="material-icons">download</span> 会話ログを保存</button>
+    </div>
+    
+    <div class="log-container" id="chatLog">
+      <div style="color: #a4b0be; text-align: center; margin-top: 20px; font-weight: bold;">準備完了！マイクを押して第一声をどうぞ。</div>
+    </div>
+    
+    <div class="action-area">
+      <button id="micBtn" class="mic-btn"><span class="material-icons" style="font-size: 38px;" id="micIcon">mic</span></button>
+      <button id="closeBtn" class="close-btn"><span class="material-icons">handshake</span> Business negotiation</button>
+    </div>
+    <div id="statusText" class="status-text">待機中...</div>
+  </div>
+</div>
+
+<script>
+  // 🚨🚨🚨 新しくデプロイした GASのURL をここに貼り付けてください 🚨🚨🚨
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbyIVZfmXPkJDpyyNEPeHeIboc32JNnNoP2kaxUoEX9EUjY_gGwowHFCiC5m2zaNkoqgIw/exec
+";
+
+  const slotData = {
+    ages: ["20代", "30代", "40代", "50代", "60代"],
+    genders: ["男性", "女性"],
+    families: ["独身・一人暮らし", "夫婦のみ", "夫婦＋子供（小学生）", "シングル親", "親と同居"],
+    statuses: ["全くの未加入", "親が掛けた昔の保険", "他社で加入・見直し検討中", "ネット保険に加入済", "保険に不信感あり"]
+  };
+
+  let generatedSystemPrompt = "";
+  let chatHistory = []; // 会話履歴を保持する配列
+  let isAudioOn = true;
+
+  // UI要素
+  const spinBtn = document.getElementById('spinBtn'); const chatSection = document.getElementById('chatSection');
+  const micBtn = document.getElementById('micBtn'); const micIcon = document.getElementById('micIcon');
+  const closeBtn = document.getElementById('closeBtn'); const chatLog = document.getElementById('chatLog');
+  const statusText = document.getElementById('statusText'); const audioToggleBtn = document.getElementById('audioToggleBtn');
+  const exportBtn = document.getElementById('exportBtn');
+
+  // --- 音声トグル処理 ---
+  audioToggleBtn.addEventListener('click', () => {
+    isAudioOn = !isAudioOn;
+    if(isAudioOn) {
+      audioToggleBtn.classList.add('active');
+      audioToggleBtn.innerHTML = '<span class="material-icons">volume_up</span> 音声ON';
+    } else {
+      audioToggleBtn.classList.remove('active');
+      audioToggleBtn.innerHTML = '<span class="material-icons">volume_off</span> 音声OFF';
+      speechSynthesis.cancel();
+    }
+  });
+
+  // --- ログ保存処理 ---
+  exportBtn.addEventListener('click', () => {
+    if (chatHistory.length === 0) return alert('保存する履歴がありません。');
+    let textContent = "【設定】\n" + generatedSystemPrompt.replace(/  +/g, '') + "\n\n【会話ログ】\n";
+    chatHistory.forEach(msg => {
+      const speaker = msg.role === "user" ? "営業担当(あなた)" : "顧客(AI)";
+      textContent += `■ ${speaker}:\n${msg.text}\n\n`;
+    });
+    const blob = new Blob([textContent], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `ロープレ記録_${new Date().toISOString().slice(0,10)}.txt`;
+    a.click();
+  });
+
+  // --- スロットロジック ---
+  spinBtn.addEventListener('click', () => {
+    spinBtn.disabled = true; chatSection.style.display = "none"; chatHistory = []; chatLog.innerHTML = '';
+    let count = 0;
+    
+    const interval = setInterval(() => {
+      document.getElementById('reel1').textContent = slotData.ages[Math.floor(Math.random() * slotData.ages.length)];
+      document.getElementById('reel2').textContent = slotData.genders[Math.floor(Math.random() * slotData.genders.length)];
+      document.getElementById('reel3').textContent = slotData.families[Math.floor(Math.random() * slotData.families.length)];
+      document.getElementById('reel4').textContent = slotData.statuses[Math.floor(Math.random() * slotData.statuses.length)];
+      count++;
+      
+      if (count > 20) { // 約2秒アニメーション
+        clearInterval(interval);
+        spinBtn.disabled = false; spinBtn.textContent = "RE-SPIN";
+        
+        const r1 = document.getElementById('reel1').textContent; const r2 = document.getElementById('reel2').textContent;
+        const r3 = document.getElementById('reel3').textContent; const r4 = document.getElementById('reel4').textContent;
+        
+        generatedSystemPrompt = `
+          あなたは以下のプロフィールの顧客です。保険営業マンのロープレ相手を務めてください。
+          【プロフィール】年代: ${r1} / 性別: ${r2} / 家族構成: ${r3} / 保険状況: ${r4}
+          【ルール】
+          ・1回の返答は人間らしく短く（2〜3文程度）。
+          ・プロフィールや保険状況に沿った態度を忠実に守ってください。
+          ・最初は警戒したり興味がない素振りをしても構いません。提案が良ければ徐々に心を開いてください。
+        `;
+        
+        chatSection.style.display = "block";
+        appendLog('system', `【顧客データ】${r1} / ${r2} / ${r3} / ${r4}\nこの設定でロープレを開始します！`);
+      }
+    }, 100);
+  });
+
+  // --- マイク録音 ＆ API通信 ---
+  let mediaRecorder; let audioChunks = []; let isRecording = false; let currentMimeType = 'audio/webm';
+
+  micBtn.addEventListener('click', async () => {
+    if (!isRecording) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream); audioChunks = [];
+        mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+        mediaRecorder.onstop = () => { sendToGAS(new Blob(audioChunks, { type: currentMimeType }), false); };
+        
+        mediaRecorder.start(); isRecording = true;
+        micBtn.classList.add('recording'); micIcon.textContent = "stop";
+        statusText.textContent = "🎙️ 録音中... (タップで送信)";
+        speechSynthesis.cancel();
+      } catch (err) { alert("マイクへのアクセスが拒否されました。"); }
+    } else {
+      mediaRecorder.stop(); isRecording = false;
+      micBtn.classList.remove('recording'); micIcon.textContent = "mic";
+      statusText.textContent = "⏳ 顧客（AI）が考えています...";
+    }
+  });
+
+  // --- クロージング判定要求 ---
+  closeBtn.addEventListener('click', () => {
+    if(chatHistory.length < 2) return alert("まだ会話が足りません！もう少しヒアリングしてみましょう。");
+    if(confirm("これまでのトーク内容でクロージング（Business negotiation）判定を受けますか？")) {
+      statusText.textContent = "📊 AIがあなたの営業スキルを分析中...";
+      micBtn.disabled = true; closeBtn.disabled = true;
+      sendToGAS(null, true);
+    }
+  });
+
+  function sendToGAS(audioBlob, isClosingRequest) {
+    let payload = {
+      systemPrompt: generatedSystemPrompt,
+      history: chatHistory,
+      isClosing: isClosingRequest
+    };
+
+    if (!isClosingRequest && audioBlob) {
+      const reader = new FileReader();
+      reader.readAsDataURL(audioBlob);
+      reader.onloadend = () => {
+        payload.base64Audio = reader.result.split(',')[1];
+        payload.mimeType = currentMimeType;
+        executeFetch(payload);
+      };
+    } else {
+      executeFetch(payload);
+    }
+  }
+
+  function executeFetch(payload) {
+    fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(result => {
+      if (!result.success) throw new Error(result.error);
+      
+      if(payload.isClosing) {
+        // クロージング結果の処理
+        appendLog('system', `【🏆 判定結果】\n${result.aiText}`);
+        statusText.textContent = "判定完了！ログを保存して分析しましょう。";
+        micBtn.disabled = false; closeBtn.disabled = false;
+      } else {
+        // 通常会話の処理
+        chatHistory.push({ role: "user", text: result.userText });
+        chatHistory.push({ role: "model", text: result.aiText });
+        
+        appendLog('user', result.userText);
+        appendLog('ai', result.aiText);
+        statusText.textContent = "マイクを押して発言";
+        
+        if (isAudioOn) playVoice(result.aiText);
+      }
+    })
+    .catch(err => {
+      statusText.textContent = "❌ エラーが発生しました";
+      console.error(err);
+      micBtn.disabled = false; closeBtn.disabled = false;
+    });
+  }
+
+  function appendLog(type, text) {
+    let html = "";
+    if (type === 'user') html = `<div class="msg msg-user"><span>あなた:</span><br>${text}</div>`;
+    else if (type === 'ai') html = `<div class="msg msg-ai"><b>顧客:</b><br>${text}</div>`;
+    else if (type === 'system') html = `<div class="msg msg-system">${text}</div>`;
+    
+    chatLog.innerHTML += html;
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
+  function playVoice(text) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'ja-JP';
+    const voices = speechSynthesis.getVoices();
+    const jaVoice = voices.find(v => v.lang === 'ja-JP' && v.name.includes('Google')) || voices.find(v => v.lang === 'ja-JP');
+    if (jaVoice) utterance.voice = jaVoice;
+    speechSynthesis.speak(utterance);
+  }
+</script>
+</body>
+</html>
